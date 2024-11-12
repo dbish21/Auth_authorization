@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>{{ user.first_name }} {{ user.last_name }}'s Profile</h2>
+        <p>Email: {{ user.email }}</p>
+        
+        {% if user.username == session['username'] or current_user.is_admin %}
+            <form action="{{ url_for('delete_user', username=user.username) }}" method="POST" class="d-inline">
+                <button class="btn btn-danger mb-4" onclick="return confirm('Are you sure?')">Delete Account</button>
+            </form>
+        {% endif %}
+
+        <h3>Feedback</h3>
+        {% if user.username == session['username'] or current_user.is_admin %}
+            <a href="{{ url_for('add_feedback', username=user.username) }}" class="btn btn-primary mb-3">Add Feedback</a>
+        {% endif %}
+
+        {% for feedback in user.feedback %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ feedback.title }}</h5>
+                    <p class="card-text">{{ feedback.content }}</p>
+                    <small class="text-muted">Created: {{ feedback.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    
+                    {% if user.username == session['username'] or current_user.is_admin %}
+                        <div class="mt-2">
+                            <a href="{{ url_for('update_feedback', feedback_id=feedback.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                            <form action="{{ url_for('delete_feedback', feedback_id=feedback.id) }}" method="POST" class="d-inline">
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>No feedback yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
